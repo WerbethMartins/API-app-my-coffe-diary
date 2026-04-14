@@ -1,0 +1,61 @@
+package com.app.api_coffe.model;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
+
+@Entity
+@Table(name = "shops") // lojas -> shops
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Shop {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "o nome da loja é obrigatório")
+    @Size(max = 200)
+    @Column(nullable = false, length = 150)
+    private String name;
+
+    @NotBlank(message = "O endereço é obrigatório")
+    @Size(max = 200)
+    @Column(nullable = false, length = 200)
+    private String address;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(length = 100)
+    private String city;
+
+    @Column(length = 20)
+    private String phone;
+
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    // Uma loja pode ter vários cafés
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<CoffeeRecord> coffeeRecords = new HashSet<>();
+
+    // Métodos auxiliares
+    public void addCoffeeRecord(CoffeeRecord coffeeRecord) {
+        this.coffeeRecords.add(coffeeRecord);
+        coffeeRecord.setShop(this);
+    }
+
+    public void removeCoffeeRecord(CoffeeRecord coffeeRecord) {
+        this.coffeeRecords.remove(coffeeRecord);
+        coffeeRecord.setShop(null);
+    }
+}

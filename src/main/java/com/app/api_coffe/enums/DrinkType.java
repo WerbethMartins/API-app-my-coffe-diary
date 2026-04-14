@@ -1,6 +1,6 @@
 package com.app.api_coffe.enums;
 
-public enum TipoBebida {
+public enum DrinkType {
     ESPRESSO,
     CAPUCCINO,
     LATTE,
