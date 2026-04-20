@@ -1,7 +1,6 @@
-package com.app.api_coffe.model;
+package com.app.api_coffee.model;
 
-import com.app.api_coffe.enums.DrinkType;
-import com.app.api_coffee.model.User;
+import com.app.api_coffee.enums.DrinkType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -39,8 +38,8 @@ public class CoffeeRecord {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Min(value = 1, message = "Minimum rating is 1")
-    @Max(value = 5, message = "Maximum rating is 5")
+    @Min(value = 1, message = "Avaliação minima é 1")
+    @Max(value = 5, message = "Avaliação máxima é 5")
     @Column(nullable = false)
     private Integer rating;
 

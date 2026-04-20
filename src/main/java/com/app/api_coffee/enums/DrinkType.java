@@ -1,4 +1,4 @@
-package com.app.api_coffe.enums;
+package com.app.api_coffee.enums;
 
 public enum DrinkType {
     ESPRESSO,

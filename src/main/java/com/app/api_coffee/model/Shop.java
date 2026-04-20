@@ -1,4 +1,4 @@
-package com.app.api_coffe.model;
+package com.app.api_coffee.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

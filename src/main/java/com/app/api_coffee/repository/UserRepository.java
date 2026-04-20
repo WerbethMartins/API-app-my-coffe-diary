@@ -1,4 +1,4 @@
-package com.app.api_coffe.repository;
+package com.app.api_coffee.repository;
 
 import com.app.api_coffee.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;

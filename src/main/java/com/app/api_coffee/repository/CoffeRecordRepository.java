@@ -1,6 +1,6 @@
-package com.app.api_coffe.repository;
+package com.app.api_coffee.repository;
 
-import com.app.api_coffe.model.CoffeeRecord;
+import com.app.api_coffee.model.CoffeeRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

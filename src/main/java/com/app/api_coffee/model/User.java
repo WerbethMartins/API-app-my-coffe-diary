@@ -1,6 +1,5 @@
-package com.app.api_coffee.model; // Ajustei de coffe para coffee (com dois 'e')
+package com.app.api_coffee.model;
 
-import com.app.api_coffe.model.CoffeeRecord;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users") // Traduzido: usuarios -> users
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,18 +24,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Username é obrigatório")
     @Size(min = 3, max = 50)
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email é obrigatório")
+    @Email(message = "O formato do email é invalido")
     @Column(nullable = false, unique = true, length = 100)
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @NotBlank(message = "A senha é obrigatória")
+    @Size(min = 8, message = "A senha deve ter nom mínimo 8 caracteres")
     @Column(nullable = false)
     private String password;
 

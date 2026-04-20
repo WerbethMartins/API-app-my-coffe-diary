@@ -1,10 +1,10 @@
-package com.app.api_coffe;
+package com.app.api_coffee;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiCoffeApplicationTests {
+class ApiCoffeeApplicationTests {
 
 	@Test
 	void contextLoads() {
