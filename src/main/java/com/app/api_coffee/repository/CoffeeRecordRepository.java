@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface CoffeRecordRepository extends JpaRepository<CoffeeRecord, Long> {
-    // Busca todos os registros de um usuário específico
-    List<CoffeeRecord> findByUserId(Long userId);
+public interface CoffeeRecordRepository extends JpaRepository<CoffeeRecord, Long> {
 
     // Busca registro de um usuário ordenados por data
     List<CoffeeRecord> findByUserIdOrderDataRecordDesc(Long userId);

@@ -16,7 +16,7 @@ public class CoffeeRecordRequestDTO {
 
     @NotBlank(message = "O título é obrigatório")
     @Size(max = 150, message = "Título deve ter no máximo 150 caracteres")
-    private String titulo;
+    private String title;
 
     @Size(max = 500, message = "Notas de sabor devem ter no máximo 500 caracteres")
     private String tastingNotes;

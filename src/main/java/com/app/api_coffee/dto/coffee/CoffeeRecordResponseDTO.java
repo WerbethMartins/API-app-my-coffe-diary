@@ -29,6 +29,6 @@ public class CoffeeRecordResponseDTO {
     private String username;
 
     // Informações da loja
-    private Long ShopId;
-    private String addressShop;
+    private Long shopId;
+    private String shopAddress;
 }

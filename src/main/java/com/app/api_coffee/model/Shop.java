@@ -3,10 +3,7 @@ package com.app.api_coffee.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,17 +14,18 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Shop {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "o nome da loja é obrigatório")
-    @Size(max = 200)
+    @NotBlank(message = "Shop name is required")
+    @Size(max = 150)
     @Column(nullable = false, length = 150)
     private String name;
 
-    @NotBlank(message = "O endereço é obrigatório")
+    @NotBlank(message = "Address is required")
     @Size(max = 200)
     @Column(nullable = false, length = 200)
     private String address;
