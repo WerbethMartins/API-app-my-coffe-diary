@@ -2,6 +2,8 @@ package com.app.api_coffee.service;
 
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
+import com.app.api_coffee.dto.shop.ShopRequestDTO;
+import com.app.api_coffee.dto.shop.ShopResponseDTO;
 import com.app.api_coffee.enums.DrinkType;
 import com.app.api_coffee.model.CoffeeRecord;
 import com.app.api_coffee.model.Shop;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public class CoffeRecordService {
     private final CoffeeRecordRepository coffeeRecordRepository;
     private final UserRepository userRepository;
-    private final ShopRepository shopRepository;
+    private final ShopService shopService;
 
     /* Cria um novo registro de café */
     @Transactional
@@ -53,16 +55,14 @@ public class CoffeRecordService {
 
         // Associação com a loja se o usuário informou loja id
         if(requestDTO.getShopId() != null) {
-            shop = shopRepository.findById(requestDTO.getShopId())
-                    .orElseThrow(() -> new RuntimeException("Loja não encontrada!"));
-            coffeeRecord.setShop(shop);
-        }else {
-            shop = shopRepository.findByNameIgnoreCase(requestDTO.getShopName())
-                    .orElseGet(() -> {
-                        Shop newShop = new Shop();
-                        newShop.setName(requestDTO.getShopName());
-                        return shopRepository.save(newShop);
-                    });
+            shop = shopService.getShopEntityById(requestDTO.getShopId());
+        } else {
+            // Cria busca pelo nome
+            ShopRequestDTO shopRequest = ShopRequestDTO.builder()
+                    .name(requestDTO.getShopName())
+                    .address("Endereço a ser atualizado!")
+                    .build();
+            shop = shopService.findOrCreateShop(shopRequest);
         }
 
         // Associa a loja oa registro

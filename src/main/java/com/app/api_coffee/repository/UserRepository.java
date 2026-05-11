@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // BUsca o usuário pelo id
+    // Busca o usuário pelo id
     Optional<User> findeById(Long id);
 
     // Busca usuário por username

@@ -4,6 +4,7 @@ import com.app.api_coffee.model.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -12,8 +13,8 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
     Optional<Shop> findByNameIgnoreCase(String name);
 
     // Busca lojas por cidade
-    Optional<Shop> findByCityIgnoreCase(String city);
+    List<Shop> findByCityIgnoreCase(String city);
 
     // Busca loja que contenham um nome(busca parcial)
-    Optional<Shop> findByNameContainingIgnoreCase(String name);
+    List<Shop> findByNameContainingIgnoreCase(String name);
 }
