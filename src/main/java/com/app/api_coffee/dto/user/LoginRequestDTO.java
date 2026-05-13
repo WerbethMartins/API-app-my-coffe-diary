@@ -1,8 +1,16 @@
 package com.app.api_coffee.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class loginRequestDTO {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginRequestDTO {
     @NotBlank(message = "Username ou email é obrigatório!")
     private String usernameOrEmail;
 

@@ -3,13 +3,11 @@ package com.app.api_coffee.service;
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
-import com.app.api_coffee.dto.shop.ShopResponseDTO;
 import com.app.api_coffee.enums.DrinkType;
 import com.app.api_coffee.model.CoffeeRecord;
 import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.model.User;
 import com.app.api_coffee.repository.CoffeeRecordRepository;
-import com.app.api_coffee.repository.ShopRepository;
 import com.app.api_coffee.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CoffeRecordService {
+public class CoffeeRecordService {
     private final CoffeeRecordRepository coffeeRecordRepository;
     private final UserRepository userRepository;
     private final ShopService shopService;
@@ -80,7 +78,7 @@ public class CoffeRecordService {
     // Lista de todos os registros de um usuário
     @Transactional()
     public List<CoffeeRecordResponseDTO> listByUser(Long userId){
-        List<CoffeeRecord> records = coffeeRecordRepository.findByUserIdOrderDataRecordDesc(userId);
+        List<CoffeeRecord> records = coffeeRecordRepository.findByUserIdOrderByRecordedAtDesc(userId);
         return records.stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());

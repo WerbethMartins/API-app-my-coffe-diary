@@ -2,10 +2,9 @@ package com.app.api_coffee.controller;
 
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
-import com.app.api_coffee.service.CoffeRecordService;
+import com.app.api_coffee.service.CoffeeRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CoffeeRecordController {
 
-    private final CoffeRecordService coffeRecordService;
+    private final CoffeeRecordService coffeeRecordService;
 
     /*
     *   Criar um novo registro de café
@@ -28,7 +27,7 @@ public class CoffeeRecordController {
             @RequestHeader("user-id") Long userId, // Temporário
             @Valid @RequestBody CoffeeRecordRequestDTO requestDTO
     ) {
-        CoffeeRecordResponseDTO response = coffeRecordService.createRecord(userId, requestDTO);
+        CoffeeRecordResponseDTO response = coffeeRecordService.createRecord(userId, requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -38,9 +37,12 @@ public class CoffeeRecordController {
 
     @GetMapping
     public  ResponseEntity<List<CoffeeRecordResponseDTO>> getMyRecords(
-            @RequestHeader("user-id") Long userId
+            @RequestHeader(value = "user-id", required = false) Long userId
     ) {
-        List<CoffeeRecordResponseDTO> records = coffeRecordService.listByUser(userId);
+        if(userId == null) {
+            userId = 1L; // Valor padrão para testes
+        }
+        List<CoffeeRecordResponseDTO> records = coffeeRecordService.listByUser(userId);
         return ResponseEntity.ok(records);
     }
 
@@ -53,7 +55,7 @@ public class CoffeeRecordController {
             @PathVariable Long id,
             @RequestHeader("user-id") Long userId
     ) {
-        CoffeeRecordResponseDTO record = coffeRecordService.findById(userId);
+        CoffeeRecordResponseDTO record = coffeeRecordService.findById(userId);
         return ResponseEntity.ok(record);
     }
 
@@ -66,7 +68,7 @@ public class CoffeeRecordController {
             @PathVariable Long id,
             @RequestHeader("user-id") Long userId
     ){
-        coffeRecordService.deleteRecord(id, userId);
+        coffeeRecordService.deleteRecord(id, userId);
         return ResponseEntity.noContent().build();
     }
 }

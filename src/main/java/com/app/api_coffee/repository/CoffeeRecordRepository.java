@@ -12,19 +12,14 @@ import java.util.List;
 public interface CoffeeRecordRepository extends JpaRepository<CoffeeRecord, Long> {
 
     // Busca registro de um usuário ordenados por data
-    List<CoffeeRecord> findByUserIdOrderDataRecordDesc(Long userId);
+    List<CoffeeRecord> findByUserIdOrderByRecordedAtDesc(Long userId);
 
     // Busca por loja
     List<CoffeeRecord> findByShop(Long lojaId);
 
     // Busca registro com nota maior ou igual a X (ex: nota >= 4)
-    List<CoffeeRecord> findByNoteGreaterThanEqual(Integer notes);
-
-    // Busca personalizada: cafés de um usuário com mínima
-    @Query("SELECT c FROM CafeRegistro c WHERE c.usuario.id = :usuarioId AND c.nota >= :notaMinima")
-    List<CoffeeRecord> findByUsuarioIdAndNotaMinima(@Param("usuarioId") Long usuarioId,
-                                                    @Param("notaMinima") Integer notaMinima);
+    List<CoffeeRecord> findByNotesGreaterThanEqual(Long userId,Integer rating);
 
     // Contar quantos cafés um usuário já registrou
-    long countByuserId(Long userId);
+    long countByUserId(Long userId);
 }
