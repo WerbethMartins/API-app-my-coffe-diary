@@ -110,7 +110,7 @@ public class ShopService {
                 .city(shop.getCity())
                 .phone(shop.getPhone())
                 .imageUrl(shop.getImageUrl())
-                .totalCafesRegistrados(shop.getCoffeeRecords().size())
+                .totalCafesRegistrados(shop.getCoffeeRecords() != null ? shop.getCoffeeRecords().size() : null)
                 .build();
     }
 

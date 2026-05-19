@@ -1,5 +1,8 @@
 package com.app.api_coffee.dto.coffee;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,8 +19,9 @@ public class CoffeeRecordResponseDTO {
     private Long id;
     private String title;
     private String tastingNotes;
-    private String nameShop;
-    private Integer notes;
+    private String shopName;
+    private String notes;
+    private Integer rating;
     private BigDecimal price;
     private String drinkType;
     private String origin;

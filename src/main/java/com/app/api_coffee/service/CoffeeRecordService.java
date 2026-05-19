@@ -35,7 +35,8 @@ public class CoffeeRecordService {
         // Mapeamento manual do DTO para entity
         coffeeRecord.setTitle(requestDTO.getTitle());
         coffeeRecord.setTastingNotes(requestDTO.getTastingNotes());
-        coffeeRecord.setNotes(String.valueOf(requestDTO.getNotes()));
+        coffeeRecord.setNotes(requestDTO.getNotes());
+        coffeeRecord.setRating(requestDTO.getRating());
         coffeeRecord.setPrice(requestDTO.getPrice());
         coffeeRecord.setOrigin(requestDTO.getOrigin());
         coffeeRecord.setImageUrl(requestDTO.getImageUrl());
@@ -112,7 +113,8 @@ public class CoffeeRecordService {
                 .id(coffeeRecord.getId())
                 .title(coffeeRecord.getTitle())
                 .tastingNotes(coffeeRecord.getTastingNotes())
-                .notes(Integer.valueOf(coffeeRecord.getNotes()))
+                .notes(coffeeRecord.getNotes())
+                .rating(coffeeRecord.getRating())
                 .price(coffeeRecord.getPrice())
                 .drinkType(coffeeRecord.getDrinkType() != null ? coffeeRecord.getDrinkType().name() : null)
                 .origin(coffeeRecord.getOrigin())

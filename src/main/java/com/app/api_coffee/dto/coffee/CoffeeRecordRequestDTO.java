@@ -1,5 +1,6 @@
 package com.app.api_coffee.dto.coffee;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,10 +26,12 @@ public class CoffeeRecordRequestDTO {
     @Size(max = 120, message = "Nome da loja deve ter no máximo 120 caracteres")
     private String shopName;
 
-    @NotNull(message = "A nota é obrigatória")
-    @Min(value = 1, message = "A nota mínima é 1")
-    @Max(value = 5, message = "A nota máxima é 5")
-    private Integer notes;
+    @NotNull(message = "As notas é obrigatória")
+    private String notes;
+
+    @Min(value = 1, message = "Avaliação minima é 1")
+    @Max(value = 5, message = "Avaliação máxima é 5")
+    private Integer rating;
 
     @Positive(message = "O preço deve ser maior que zero")
     private BigDecimal price;

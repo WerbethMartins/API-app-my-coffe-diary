@@ -2,6 +2,7 @@ package com.app.api_coffee.controller;
 
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
+import com.app.api_coffee.security.JwtUtil;
 import com.app.api_coffee.service.CoffeeRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class CoffeeRecordController {
 
     private final CoffeeRecordService coffeeRecordService;
+    private final JwtUtil jwtUtil;
 
     /*
     *   Criar um novo registro de café
@@ -24,9 +26,11 @@ public class CoffeeRecordController {
 
     @PostMapping
     public ResponseEntity<CoffeeRecordResponseDTO> createRecord(
-            @RequestHeader("user-id") Long userId, // Temporário
-            @Valid @RequestBody CoffeeRecordRequestDTO requestDTO
-    ) {
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody CoffeeRecordRequestDTO requestDTO) {
+
+        Long userId = extractUserIdFromHeader(authHeader);
+
         CoffeeRecordResponseDTO response = coffeeRecordService.createRecord(userId, requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -36,12 +40,11 @@ public class CoffeeRecordController {
     * */
 
     @GetMapping
-    public  ResponseEntity<List<CoffeeRecordResponseDTO>> getMyRecords(
-            @RequestHeader(value = "user-id", required = false) Long userId
-    ) {
-        if(userId == null) {
-            userId = 1L; // Valor padrão para testes
-        }
+    public ResponseEntity<List<CoffeeRecordResponseDTO>> getMyRecords(
+            @RequestHeader("Authorization") String authHeader) {
+
+        Long userId = extractUserIdFromHeader(authHeader);
+
         List<CoffeeRecordResponseDTO> records = coffeeRecordService.listByUser(userId);
         return ResponseEntity.ok(records);
     }
@@ -53,8 +56,11 @@ public class CoffeeRecordController {
     @GetMapping("/{id}")
     public ResponseEntity<CoffeeRecordResponseDTO> getRecordById(
             @PathVariable Long id,
-            @RequestHeader("user-id") Long userId
+            @RequestHeader("Authorization") String authHeader
     ) {
+
+        Long userId = extractUserIdFromHeader(authHeader);
+
         CoffeeRecordResponseDTO record = coffeeRecordService.findById(userId);
         return ResponseEntity.ok(record);
     }
@@ -71,4 +77,17 @@ public class CoffeeRecordController {
         coffeeRecordService.deleteRecord(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Metodo auxiliar para extrair userId do token
+     */
+    private Long extractUserIdFromHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Token não encontrado ou inválido");
+        }
+
+        String token = authHeader.substring(7);
+        return jwtUtil.extractUserId(token);
+    }
+
 }

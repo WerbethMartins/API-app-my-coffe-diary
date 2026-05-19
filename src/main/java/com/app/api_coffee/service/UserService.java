@@ -7,6 +7,7 @@ import com.app.api_coffee.dto.user.UserResponseDTO;
 import com.app.api_coffee.model.User;
 import com.app.api_coffee.repository.CoffeeRecordRepository;
 import com.app.api_coffee.repository.UserRepository;
+import com.app.api_coffee.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -51,18 +54,20 @@ public class UserService {
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsernameOrEmail())
                 .or(() -> userRepository.findByEmail(loginRequest.getUsernameOrEmail()));
 
-        User user = userOptional.orElseThrow(() -> new RuntimeException("Invalid username/email or password"));
+        User user = userOptional.orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
             throw new RuntimeException("Invalid username/email or password");
         }
+
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
 
         // Token JWT
         return LoginResponseDTO.builder()
                 .userId(user.getId())
                 .username(user.getFullName())
                 .email(user.getEmail())
-                .token("temporary-token" + user.getId())
+                .token(token)
                 .build();
 
     }

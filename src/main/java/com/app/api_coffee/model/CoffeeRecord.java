@@ -38,8 +38,6 @@ public class CoffeeRecord {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Min(value = 1, message = "Avaliação minima é 1")
-    @Max(value = 5, message = "Avaliação máxima é 5")
     @Column(nullable = false)
     private Integer rating;
 

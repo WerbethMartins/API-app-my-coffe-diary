@@ -14,9 +14,6 @@ public interface CoffeeRecordRepository extends JpaRepository<CoffeeRecord, Long
     // Busca registro de um usuário ordenados por data
     List<CoffeeRecord> findByUserIdOrderByRecordedAtDesc(Long userId);
 
-    // Busca por loja
-    List<CoffeeRecord> findByShop(Long lojaId);
-
     // Busca registro com nota maior ou igual a X (ex: nota >= 4)
     List<CoffeeRecord> findByNotesGreaterThanEqual(Long userId,Integer rating);
 
