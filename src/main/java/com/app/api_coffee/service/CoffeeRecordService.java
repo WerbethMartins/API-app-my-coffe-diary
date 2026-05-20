@@ -4,6 +4,7 @@ import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
 import com.app.api_coffee.enums.DrinkType;
+import com.app.api_coffee.exception.ResourceNotFoundException;
 import com.app.api_coffee.model.CoffeeRecord;
 import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.model.User;
@@ -28,7 +29,7 @@ public class CoffeeRecordService {
     public CoffeeRecordResponseDTO createRecord(Long userId, CoffeeRecordRequestDTO requestDTO){
         // Busca o usuário e lança uma exceção se não encontrar
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!" + userId));
 
         CoffeeRecord coffeeRecord = new CoffeeRecord();
 
@@ -89,7 +90,7 @@ public class CoffeeRecordService {
     @Transactional()
     public CoffeeRecordResponseDTO findById(Long id){
         CoffeeRecord records = coffeeRecordRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Registro de café não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Registro de café não encontrado" + id));
         return convertToResponseDTO(records);
     }
 

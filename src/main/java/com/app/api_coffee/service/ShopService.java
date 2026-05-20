@@ -2,6 +2,7 @@ package com.app.api_coffee.service;
 
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
 import com.app.api_coffee.dto.shop.ShopResponseDTO;
+import com.app.api_coffee.exception.ResourceNotFoundException;
 import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.repository.ShopRepository;
 import jakarta.transaction.Transactional;
@@ -32,7 +33,7 @@ public class ShopService {
     @Transactional
     public Shop getShopEntityById(Long id) {
         return shopRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Shop not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found with id: " + id));
     }
 
 
@@ -74,7 +75,7 @@ public class ShopService {
     @Transactional
     public ShopResponseDTO getShopById(Long id){
         Shop shop = shopRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Shop not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Shop not found with id: " + id));
         return convertToResponseDTO(shop);
     }
 

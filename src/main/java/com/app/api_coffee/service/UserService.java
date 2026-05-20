@@ -4,6 +4,7 @@ import com.app.api_coffee.dto.user.LoginRequestDTO;
 import com.app.api_coffee.dto.user.LoginResponseDTO;
 import com.app.api_coffee.dto.user.UserRequestDTO;
 import com.app.api_coffee.dto.user.UserResponseDTO;
+import com.app.api_coffee.exception.ResourceNotFoundException;
 import com.app.api_coffee.model.User;
 import com.app.api_coffee.repository.CoffeeRecordRepository;
 import com.app.api_coffee.repository.UserRepository;
@@ -74,7 +75,7 @@ public class UserService {
 
     public UserResponseDTO getUserById(Long id){
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found" + id));
         return convertToResponseDTO(user);
     }
 
