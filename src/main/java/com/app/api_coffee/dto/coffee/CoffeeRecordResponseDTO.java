@@ -26,6 +26,7 @@ public class CoffeeRecordResponseDTO {
     private String drinkType;
     private String origin;
     private String imageUrl;
+    private String fullImageUrl;
     private LocalDateTime recordedAt;
 
     // Informações do usuário

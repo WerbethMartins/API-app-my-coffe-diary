@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -44,6 +45,6 @@ public class CoffeeRecordRequestDTO {
     // ID da loja (se o usuário escolher uma loja já cadastrada)
     private Long shopId;
 
-    // Campo para upload de foto (por enquanto só a URL, o upload será tratado no Service)
-    private String imageUrl;
+    // Campo para upload de foto
+    private MultipartFile image;
 }

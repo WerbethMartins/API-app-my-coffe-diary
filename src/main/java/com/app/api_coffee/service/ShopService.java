@@ -3,6 +3,7 @@ package com.app.api_coffee.service;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
 import com.app.api_coffee.dto.shop.ShopResponseDTO;
 import com.app.api_coffee.exception.ResourceNotFoundException;
+import com.app.api_coffee.model.CoffeeRecord;
 import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.repository.ShopRepository;
 import jakarta.transaction.Transactional;
@@ -50,6 +51,7 @@ public class ShopService {
         Shop shop = Shop.builder()
                 .name(requestDTO.getName())
                 .address(requestDTO.getAddress())
+                .description(requestDTO.getDescription())
                 .city(requestDTO.getCity())
                 .phone(requestDTO.getPhone())
                 .imageUrl(requestDTO.getImageUrl())
@@ -103,6 +105,8 @@ public class ShopService {
 
     // Conversor Entity -> DTO
     private ShopResponseDTO convertToResponseDTO(Shop shop){
+        Double media = shopRepository.findAverageRatingByShopId(shop.getId());
+
         return ShopResponseDTO.builder()
                 .id(shop.getId())
                 .name(shop.getName())
@@ -111,7 +115,8 @@ public class ShopService {
                 .city(shop.getCity())
                 .phone(shop.getPhone())
                 .imageUrl(shop.getImageUrl())
-                .totalCafesRegistrados(shop.getCoffeeRecords() != null ? shop.getCoffeeRecords().size() : null)
+                .totalCoffeesRegistered(shop.getCoffeeRecords() != null ? shop.getCoffeeRecords().size() : null)
+                .notaMedia(media != null ? Math.round(media * 10.0) / 10.0 : null)
                 .build();
     }
 

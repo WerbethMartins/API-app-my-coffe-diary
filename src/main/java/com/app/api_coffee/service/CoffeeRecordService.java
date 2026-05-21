@@ -12,9 +12,18 @@ import com.app.api_coffee.repository.CoffeeRecordRepository;
 import com.app.api_coffee.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +32,9 @@ public class CoffeeRecordService {
     private final CoffeeRecordRepository coffeeRecordRepository;
     private final UserRepository userRepository;
     private final ShopService shopService;
+
+    @Value("${app.upload.dir:uploads/coffee-images}")
+    private String uploadDir;
 
     /* Cria um novo registro de café */
     @Transactional
@@ -40,7 +52,11 @@ public class CoffeeRecordService {
         coffeeRecord.setRating(requestDTO.getRating());
         coffeeRecord.setPrice(requestDTO.getPrice());
         coffeeRecord.setOrigin(requestDTO.getOrigin());
-        coffeeRecord.setImageUrl(requestDTO.getImageUrl());
+
+        if(requestDTO.getImage() != null && !requestDTO.getImage().isEmpty()){
+            String imageUrl = saveImage(requestDTO.getImage());
+            coffeeRecord.setImageUrl(imageUrl);
+        }
 
         // Converter String para Enum
         if(requestDTO.getDrinkType() != null && !requestDTO.getDrinkType().isBlank()){
@@ -110,6 +126,13 @@ public class CoffeeRecordService {
 
     // Metodo auxiliar para converter Entiry -> ResponseDTO
     private CoffeeRecordResponseDTO convertToResponseDTO(CoffeeRecord coffeeRecord){
+        String imageUrl = coffeeRecord.getImageUrl();
+        String fullImageUrl = null;
+
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            fullImageUrl = "http://localhost:8080" + imageUrl;   // Em produção você vai mudar isso
+        }
+
         return CoffeeRecordResponseDTO.builder()
                 .id(coffeeRecord.getId())
                 .title(coffeeRecord.getTitle())
@@ -119,7 +142,8 @@ public class CoffeeRecordService {
                 .price(coffeeRecord.getPrice())
                 .drinkType(coffeeRecord.getDrinkType() != null ? coffeeRecord.getDrinkType().name() : null)
                 .origin(coffeeRecord.getOrigin())
-                .imageUrl(coffeeRecord.getImageUrl())
+                .imageUrl(imageUrl)
+                .fullImageUrl(fullImageUrl)
                 .recordedAt(coffeeRecord.getRecordedAt())
                 .userId(coffeeRecord.getUser().getId())
                 .username(coffeeRecord.getUser().getUsername())
@@ -127,4 +151,30 @@ public class CoffeeRecordService {
                 .shopAddress(coffeeRecord.getShop() != null ? coffeeRecord.getShop().getAddress() : null)
                 .build();
     }
+
+    private String saveImage(MultipartFile file) {
+        try {
+            // Cria pasta se não existir
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            System.out.println("\uD83D\uDCC1 Salvando imagem em: " + uploadPath.toString());
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // Gera nome único
+            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
+            String newFileName = UUID.randomUUID() + fileExtension;
+
+            Path filePath = uploadPath.resolve(newFileName);
+            file.transferTo(filePath.toFile());
+
+            return "/upload/coffee-images/" + newFileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image: " + e.getMessage());
+        }
+    }
+
 }

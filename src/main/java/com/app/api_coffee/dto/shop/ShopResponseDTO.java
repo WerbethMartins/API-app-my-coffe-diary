@@ -20,6 +20,6 @@ public class ShopResponseDTO {
     private String imageUrl;
 
     // Estatísticas úteis
-    private Integer totalCafesRegistrados;
+    private Integer totalCoffeesRegistered;
     private Double notaMedia;
 }

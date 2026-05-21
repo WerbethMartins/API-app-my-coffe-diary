@@ -7,6 +7,7 @@ import com.app.api_coffee.service.CoffeeRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +25,10 @@ public class CoffeeRecordController {
     *   Criar um novo registro de café
     * */
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CoffeeRecordResponseDTO> createRecord(
             @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody CoffeeRecordRequestDTO requestDTO) {
+            @Valid @ModelAttribute CoffeeRecordRequestDTO requestDTO) {
 
         Long userId = extractUserIdFromHeader(authHeader);
 
