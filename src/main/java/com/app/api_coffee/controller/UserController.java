@@ -1,12 +1,11 @@
 package com.app.api_coffee.controller;
 
-import com.app.api_coffee.dto.user.LoginRequestDTO;
-import com.app.api_coffee.dto.user.LoginResponseDTO;
-import com.app.api_coffee.dto.user.UserRequestDTO;
-import com.app.api_coffee.dto.user.UserResponseDTO;
+import com.app.api_coffee.dto.user.*;
+import com.app.api_coffee.security.JwtUtil;
 import com.app.api_coffee.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO request) {
@@ -34,6 +34,23 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> getUser(@Valid @PathVariable Long id){
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+
+    @GetMapping("/me/dashboard")
+    public ResponseEntity<UserDashboardDTO> getDashboard(@RequestHeader("Authorization") String authHeader){
+        Long userId = extractUserIdFromHeader(authHeader);
+        UserDashboardDTO dashboardDTO = userService.getUserDashboard(userId);
+        return ResponseEntity.ok(dashboardDTO);
+    }
+
+    // ==================== METODO AUXILIAR ====================
+    private Long extractUserIdFromHeader(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new RuntimeException("Token de autenticação não encontrado ou inválido");
+        }
+
+        String token = authHeader.substring(7).trim();
+        return jwtUtil.extractUserId(token);
     }
 
 }

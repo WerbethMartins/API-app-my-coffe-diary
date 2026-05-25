@@ -11,9 +11,11 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig  implements WebMvcConfigurer {
 
+    // Diretório onde as imagens serão armazenadas, configurável via application.properties
     @Value("${app.upload.dir:uploads/coffee-images}")
     private String uploadDir;
 
+    // Configura o mapeamento para servir arquivos estáticos do diretório de uploads
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry){
         // Converte o caminho relativo para absoluto
