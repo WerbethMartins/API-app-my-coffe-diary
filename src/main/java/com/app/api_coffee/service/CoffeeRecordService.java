@@ -1,5 +1,6 @@
 package com.app.api_coffee.service;
 
+import com.app.api_coffee.dto.PageResponseDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
@@ -13,6 +14,8 @@ import com.app.api_coffee.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +38,25 @@ public class CoffeeRecordService {
 
     @Value("${app.upload.dir:uploads/coffee-images}")
     private String uploadDir;
+
+    // Lista de cafés com paginação
+    @Transactional
+    public PageResponseDTO<CoffeeRecordResponseDTO> getRecordsByUserPaginated(Long userId, Pageable pageable){
+        Page<CoffeeRecord> page = coffeeRecordRepository.findByUserIdOrderByRecordedAtDesc(userId, pageable);
+
+        List<CoffeeRecordResponseDTO> content = page.getContent().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+
+        return PageResponseDTO.<CoffeeRecordResponseDTO>builder()
+                .content(content)
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .isLast(page.isLast())
+                .build();
+    }
 
     /* Cria um novo registro de café */
     @Transactional

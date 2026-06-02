@@ -1,11 +1,16 @@
 package com.app.api_coffee.controller;
 
+import com.app.api_coffee.dto.PageResponseDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordRequestDTO;
 import com.app.api_coffee.dto.coffee.CoffeeRecordResponseDTO;
 import com.app.api_coffee.security.JwtUtil;
 import com.app.api_coffee.service.CoffeeRecordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,17 +42,23 @@ public class CoffeeRecordController {
     }
 
     /*
-    *  Listar todos os registrtos do usuário
+    * Lista os cafés por página
     * */
 
     @GetMapping
-    public ResponseEntity<List<CoffeeRecordResponseDTO>> getMyRecords(
-            @RequestHeader("Authorization") String authHeader) {
-
+    public ResponseEntity<PageResponseDTO<CoffeeRecordResponseDTO>> getMyRecordsByPage(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size  
+){
         Long userId = extractUserIdFromHeader(authHeader);
 
-        List<CoffeeRecordResponseDTO> records = coffeeRecordService.listByUser(userId);
-        return ResponseEntity.ok(records);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("recordedAt").descending());
+
+        PageResponseDTO<CoffeeRecordResponseDTO> responseDTO =
+                coffeeRecordService.getRecordsByUserPaginated(userId, pageable);
+
+        return ResponseEntity.ok(responseDTO);
     }
 
     /*

@@ -1,6 +1,8 @@
 package com.app.api_coffee.repository;
 
 import com.app.api_coffee.model.Shop;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,9 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
 
     // Busca loja que contenham um nome(busca parcial)
     List<Shop> findByNameContainingIgnoreCase(String name);
+
+    // Listar lojas e paginação
+    Page<Shop> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     @Query("SELECT AVG(cr.rating) FROM CoffeeRecord cr WHERE cr.shop.id = :shopId")
     Double findAverageRatingByShopId(@Param("shopId") Long shopId);

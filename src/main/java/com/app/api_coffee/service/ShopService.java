@@ -1,5 +1,6 @@
 package com.app.api_coffee.service;
 
+import com.app.api_coffee.dto.PageResponseDTO;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
 import com.app.api_coffee.dto.shop.ShopResponseDTO;
 import com.app.api_coffee.exception.ResourceNotFoundException;
@@ -8,6 +9,8 @@ import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.repository.ShopRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,6 +38,28 @@ public class ShopService {
     public Shop getShopEntityById(Long id) {
         return shopRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Shop not found with id: " + id));
+    }
+
+    /*
+    * Listar lojas com paginação
+    * */
+
+    @Transactional
+    public PageResponseDTO<ShopResponseDTO> getShopsPaginated(Pageable pageable){
+        Page<Shop> page = shopRepository.findAll(pageable);
+
+        List<ShopResponseDTO> content = page.getContent().stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+
+        return PageResponseDTO.<ShopResponseDTO>builder()
+                .content(content)
+                .pageNumber(page.getNumber())
+                .pageSize(page.getSize())
+                .totalElements(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .isLast(page.isLast())
+                .build();
     }
 
 

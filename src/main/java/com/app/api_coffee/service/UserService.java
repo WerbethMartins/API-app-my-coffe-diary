@@ -13,14 +13,18 @@ import com.app.api_coffee.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,8 +34,10 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final CoffeeRecordRepository coffeeRecordRepository;
+
+    @Value("${app.upload.dir:uploads/coffee-images}")
+    private String uploadDir;
 
     @Transactional
     public UserResponseDTO register(@Valid UserRequestDTO request){
@@ -46,10 +52,16 @@ public class UserService {
         User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword())) // Hash da senha
+                .password(passwordEncoder.encode(request.getPassword()))
                 .fullName(request.getFullName())
-                .roles(Set.of("ROLE_USER")) // Role Padrão
+                .roles(Set.of("ROLE_USER"))
                 .build();
+
+        // Upload da foto de perfil
+        if (request.getProfilePictureUrl() != null && !request.getProfilePictureUrl().isEmpty()) {
+            String photoUrl = saveProfilePicture(request.getProfilePictureUrl());
+            user.setProfilePictureUrl(photoUrl);
+        }
 
         User savedUser = userRepository.save(user);
 
@@ -106,9 +118,9 @@ public class UserService {
         List<CoffeeRecord> allRecords = coffeeRecordRepository.findByUserIdOrderByRecordedAtDesc(userId);
 
         double notaMediaGeral = allRecords.stream()
-                .mapToInt(CoffeeRecord::getRating)
+                .mapToInt(CoffeeRecord::getRating) // // Extrai as notas
                 .average()
-                .orElse(0.0);
+                .orElse(0.0); // Calcula a média, ou retorna 0.0 se não houver registros
 
         // Cafés deste mês
         int coffeesThisMonth = (int) allRecords.stream()
@@ -118,16 +130,16 @@ public class UserService {
 
         // Loja favorita (a com mais registros)
         Shop favoriteShop = allRecords.stream()
-                .filter(r -> r.getShop() != null)
-                .collect(Collectors.groupingBy(CoffeeRecord::getShop, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
+                .filter(r -> r.getShop() != null) // Filtra apenas registros com loja associada
+                .collect(Collectors.groupingBy(CoffeeRecord::getShop, Collectors.counting())) // Agrupa por loja e conta os registros
+                .entrySet().stream() // Encontra a loja com mais registros
+                .max(Map.Entry.comparingByValue()) // Compara pelo número de registros
+                .map(Map.Entry::getKey) // Retorna a loja favorita
                 .orElse(null);
 
         // Top 3 cafês
         List<CoffeeTopDTO> top3 = allRecords.stream()
-                .sorted((a, b) -> b.getRating().compareTo(a.getRating()))
+                .sorted((a, b) -> b.getRating().compareTo(a.getRating())) // Ordena por nota (descendente)
                 .limit(3)
                 .map(this::convertToCoffeeTopDTO)
                 .collect(Collectors.toList());
@@ -170,6 +182,26 @@ public class UserService {
                 .rating(record.getRating())
                 .shopName(record.getShop() != null ? record.getShop().getName() : null)
                 .build();
+    }
+
+    // Metodo auxiliar para salvar foto de perfil
+    private String saveProfilePicture(MultipartFile file) {
+        try {
+            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String fileName = UUID.randomUUID() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
+            Path filePath = uploadPath.resolve(fileName);
+
+            file.transferTo(filePath.toFile());
+
+            return "/uploads/coffee-images/" + fileName;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao salvar foto de perfil: " + e.getMessage());
+        }
     }
 
 }

@@ -1,10 +1,15 @@
 package com.app.api_coffee.controller;
 
+import com.app.api_coffee.dto.PageResponseDTO;
 import com.app.api_coffee.dto.shop.ShopRequestDTO;
 import com.app.api_coffee.dto.shop.ShopResponseDTO;
+import com.app.api_coffee.security.JwtUtil;
 import com.app.api_coffee.service.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,9 +22,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ShopController {
     private final ShopService shopService;
+    private final JwtUtil jwtUtil;
 
     /*
-    * Criar uma nova cafeteria
+    * Listar cafeterias com paginação
+    * */
+
+    @GetMapping
+    public ResponseEntity<PageResponseDTO<ShopResponseDTO>> getAllShops(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+
+        PageResponseDTO<ShopResponseDTO> response = shopService.getShopsPaginated(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    /*
+    * Cria uma nova loja
     * */
 
     @PostMapping
@@ -27,15 +48,6 @@ public class ShopController {
 
         ShopResponseDTO response = shopService.createShop(requestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
-
-    /*
-    * Listar todas as lojas cadastradas
-    * */
-    @GetMapping()
-    public ResponseEntity<List<ShopResponseDTO>> getAllShops() {
-        List<ShopResponseDTO> shops = shopService.getAllShops();
-        return ResponseEntity.ok(shops);
     }
 
     // Buscar por id
