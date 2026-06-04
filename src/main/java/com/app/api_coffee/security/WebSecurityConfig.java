@@ -39,8 +39,15 @@ public class WebSecurityConfig {
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(List.of("*"));
+
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000", // React Web
+            "http://localhost:8081", // Expo go / React Native
+            "http://meuapp.com", // Dominio
+            "exp://*"
+        ));
+
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
 

@@ -11,6 +11,7 @@ import com.app.api_coffee.model.Shop;
 import com.app.api_coffee.model.User;
 import com.app.api_coffee.repository.CoffeeRecordRepository;
 import com.app.api_coffee.repository.UserRepository;
+import com.app.api_coffee.storage.FileStorageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ public class CoffeeRecordService {
     private final CoffeeRecordRepository coffeeRecordRepository;
     private final UserRepository userRepository;
     private final ShopService shopService;
+    private final FileStorageService fileStorageService;
 
     @Value("${app.upload.dir:uploads/coffee-images}")
     private String uploadDir;
@@ -75,8 +77,8 @@ public class CoffeeRecordService {
         coffeeRecord.setPrice(requestDTO.getPrice());
         coffeeRecord.setOrigin(requestDTO.getOrigin());
 
-        if(requestDTO.getImage() != null && !requestDTO.getImage().isEmpty()){
-            String imageUrl = saveImage(requestDTO.getImage());
+        if (requestDTO.getImage() != null && !requestDTO.getImage().isEmpty()) {
+            String imageUrl = fileStorageService.uploadFile(requestDTO.getImage(), "coffee-images");
             coffeeRecord.setImageUrl(imageUrl);
         }
 
@@ -170,33 +172,38 @@ public class CoffeeRecordService {
                 .userId(coffeeRecord.getUser().getId())
                 .username(coffeeRecord.getUser().getUsername())
                 .shopId(coffeeRecord.getShop() != null ? coffeeRecord.getShop().getId() : null)
+                .shopName(coffeeRecord.getShop() != null ? coffeeRecord.getShop().getName() : null)
                 .shopAddress(coffeeRecord.getShop() != null ? coffeeRecord.getShop().getAddress() : null)
                 .build();
     }
 
-    private String saveImage(MultipartFile file) {
+    private String saveImage(MultipartFile file, String folder) {
         try {
-            // Cria pasta se não existir
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-            System.out.println("\uD83D\uDCC1 Salvando imagem em: " + uploadPath.toString());
 
+            // Define caminho
+            Path uploadPath = Paths.get(uploadDir, folder).toAbsolutePath().normalize();
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
-            // Gera nome único
-            String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
-            String fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String newFileName = UUID.randomUUID() + fileExtension;
+            // Nome limpo e único
+            String originalName = StringUtils.cleanPath(file.getOriginalFilename());
+            String extension = originalName.substring(originalName.lastIndexOf(".")).toLowerCase();
+            String newFileName = UUID.randomUUID() + extension;
 
             Path filePath = uploadPath.resolve(newFileName);
+
+            // Salva o arquivo
             file.transferTo(filePath.toFile());
 
-            return "/upload/coffee-images/" + newFileName;
+            System.out.println("✅ Upload local realizado: " + newFileName);
+
+            return "/uploads/" + folder + "/" + newFileName;
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save image: " + e.getMessage());
+            throw new RuntimeException("Falha ao salvar imagem: " + e.getMessage());
         }
     }
+
 
 }

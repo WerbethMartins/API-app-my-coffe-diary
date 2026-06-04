@@ -10,6 +10,7 @@ import com.app.api_coffee.model.User;
 import com.app.api_coffee.repository.CoffeeRecordRepository;
 import com.app.api_coffee.repository.UserRepository;
 import com.app.api_coffee.security.JwtUtil;
+import com.app.api_coffee.storage.FileStorageService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +36,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CoffeeRecordRepository coffeeRecordRepository;
+    private final FileStorageService fileStorageService; // Injeção
 
-    @Value("${app.upload.dir:uploads/coffee-images}")
+    @Value("${app.upload.dir:uploads/profile-pictures}")
     private String uploadDir;
 
     @Transactional
@@ -58,9 +60,17 @@ public class UserService {
                 .build();
 
         // Upload da foto de perfil
-        if (request.getProfilePictureUrl() != null && !request.getProfilePictureUrl().isEmpty()) {
-            String photoUrl = saveProfilePicture(request.getProfilePictureUrl());
-            user.setProfilePictureUrl(photoUrl);
+        if (request.getProfilePicture() != null && !request.getProfilePicture().isEmpty()) {
+            try {
+                String photoUrl = fileStorageService.uploadFile(request.getProfilePicture(), "profile-pictures");
+                user.setProfilePictureUrl(photoUrl);
+                System.out.println("✅ Foto de perfil salva: " + photoUrl);   // Log para debug
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao salvar foto de perfil: " + e.getMessage());
+                // Não interrompe o cadastro se a foto falhar
+            }
+        } else {
+            System.out.println("⚠️ Nenhuma foto de perfil enviada");
         }
 
         User savedUser = userRepository.save(user);
@@ -182,26 +192,6 @@ public class UserService {
                 .rating(record.getRating())
                 .shopName(record.getShop() != null ? record.getShop().getName() : null)
                 .build();
-    }
-
-    // Metodo auxiliar para salvar foto de perfil
-    private String saveProfilePicture(MultipartFile file) {
-        try {
-            Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String fileName = UUID.randomUUID() + "_" + StringUtils.cleanPath(file.getOriginalFilename());
-            Path filePath = uploadPath.resolve(fileName);
-
-            file.transferTo(filePath.toFile());
-
-            return "/uploads/coffee-images/" + fileName;
-
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao salvar foto de perfil: " + e.getMessage());
-        }
     }
 
 }
